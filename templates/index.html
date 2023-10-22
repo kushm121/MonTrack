@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Modern Design with Navbar</title>
+  <link rel="stylesheet" href="../static/styles2.css">
+</head>
+<body>
+  <nav>
+   <div class="navbar">
+      {%for i in result%}
+      <div class="navbar-title">{{i[0]}}'s DashBoard</div>
+      {%endfor%}
+      <button class="navbar-button logout" ><a href="/logout">Logout</a></button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section1">
+    <!-- Content for Section 1 -->
+    <div class="balance-info">
+      <p>Total Balance: $500.00</p>
+      <p>Money Spent Today: $50.00</p>
+    </div>
+    <div class="buttons">
+      <button id="add-funds-btn">Add Funds</button>
+      <button id="add-expense-btn">Add Expense</button>
+    </div>
+
+
+     <div class="popup-form" id="add-funds-form">
+      <label for="amount">Amount:</label>
+      <input type="text" id="amount" placeholder="Enter amount">
+
+      <button id="add-funds-submit">Submit</button>
+    </div>
+
+    <div class="popup-form" id="add-expense-form">
+      <label for="expense-amount">Amount:</label>
+      <input type="text" id="expense-amount" placeholder="Enter amount">
+
+      <label for="category">Category:</label>
+      <select id="category">
+        <option value="food">Food</option>
+        <option value="transportation">Transportation</option>
+        <option value="utilities">Utilities</option>
+        <option value="entertainment">Entertainment</option>
+        <option value="other">Other</option>
+      </select>
+
+      <button id="add-expense-submit">Submit</button>
+    </div>
+        <div class="separator"></div>
+    <ul class="transaction-list">
+      <li>
+        <div class="transaction-details">
+          <span class="transaction-title">Payment received</span>
+          <span class="transaction-date">2021-09-15T22:10:00</span>
+        </div>
+        <span class="transaction-amount transaction-credited">+ $50.00</span>
+      </li>
+      <li>
+        <div class="transaction-details">
+          <span class="transaction-title">Grocery shopping</span>
+          <span class="transaction-date">2021-09-14T09:30:00</span>
+        </div>
+        <span class="transaction-amount transaction-debited">- $25.00</span>
+      </li>
+      <!-- Add more transaction items as needed -->
+    </ul>
+  </div>
+    <div class="section2">
+        <h2>Expenses by Category</h2>
+        <canvas id="expensesChart" width="400" height="400"></canvas>
+    </div>
+    <div class="section full-width" >
+      <h2>Expenses and Income</h2>
+      <canvas id="lineDoubleBarChart" width="800" height="300"></canvas>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Get the canvas elements
+    const expensesChartCanvas = document.getElementById('expensesChart');
+
+
+    // Create the doughnut chart
+    new Chart(expensesChartCanvas, {
+      type: 'doughnut',
+      data: {
+        labels: ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Category 5'],
+        datasets: [{
+          data: [50, 80, 30, 60, 30],
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+        }]
+      },
+      options: {
+        responsive: true,
+        legend: {
+          display: true,
+          position: 'bottom',
+        },
+      }
+    });
+
+    // Create the line double bar chart
+    const chartCanvas = document.getElementById('lineDoubleBarChart');
+
+  // Create the line double bar chart
+  new Chart(chartCanvas, {
+    type: 'bar',
+    data: {
+      labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September','October','November','December'],
+      datasets: [
+        {
+          label: 'Expenses',
+          data: [500, 600, 400, 700, 550, 800],
+          backgroundColor: 'rgba(255, 99, 132, 0.5)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 1
+        },
+        {
+          label: 'Income',
+          data: [1000, 1200, 900, 1100, 950, 1300],
+          backgroundColor: 'rgba(54, 162, 235, 0.5)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        },
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        xAxes: [{
+          gridLines: {
+            display: false // Hide the x-axis grid lines
+          }
+        }],
+        yAxes: [{
+          gridLines: {
+            drawBorder: false, // Hide the y-axis grid lines
+            display: false // Hide the y-axis grid lines
+          },
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      },
+      legend: {
+        display: true,
+        position: 'bottom',
+      },
+    }
+  });
+
+   const transactionDateElements = document.querySelectorAll('.transaction-date');
+
+  transactionDateElements.forEach((element) => {
+    const transactionDate = new Date(element.textContent);
+    const formattedDate = transactionDate.toLocaleString('en-US', {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    });
+
+    element.textContent = formattedDate;
+  });
+
+  const addFundsBtn = document.getElementById("add-funds-btn");
+  const addFundsForm = document.getElementById("add-funds-form");
+  const addFundsSubmitBtn = document.getElementById("add-funds-submit");
+
+  addFundsBtn.addEventListener("click", function() {
+    addFundsForm.style.display = "block";
+  });
+
+  addFundsSubmitBtn.addEventListener("click", function() {
+    addFundsForm.style.display = "none";
+  });
+
+  const addExpenseBtn = document.getElementById("add-expense-btn");
+  const addExpenseForm = document.getElementById("add-expense-form");
+  const addExpenseSubmitBtn = document.getElementById("add-expense-submit");
+
+  addExpenseBtn.addEventListener("click", function() {
+    addExpenseForm.style.display = "block";
+  });
+
+  addExpenseSubmitBtn.addEventListener("click", function() {
+    addExpenseForm.style.display = "none";
+  });
+  </script>
+</body>
+</html>
