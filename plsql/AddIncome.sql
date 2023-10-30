@@ -10,10 +10,6 @@ CREATE OR REPLACE PROCEDURE InsertTransactionAndCategory (
 )
 IS
 BEGIN
-    -- Insert into User_Income_Categories table
-    INSERT INTO User_Income_Categories (CategoryID, Username)
-    VALUES (p_CategoryID, p_Username);
-    
     -- Insert into Transactions table
     INSERT INTO Transactions (TransactionID, Username, CategoryID, Amount, Description, TransactionDate)
     VALUES (p_TransactionID, p_Username, p_CategoryID, p_Amount, p_Description, p_TransactionDate);
