@@ -1,72 +1,79 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Modern Design with Navbar</title>
-  <link rel="stylesheet" href="../static/styles2.css">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='styles2.css') }}">
 </head>
 <body>
   <nav>
    <div class="navbar">
-      {%for i in result%}
-      <div class="navbar-title">{{i[0]}}'s DashBoard</div>
-      {%endfor%}
+
+      <div class="navbar-title">{{result}}'s DashBoard</div>
+
       <button class="navbar-button logout" ><a href="/logout">Logout</a></button>
     </div>
   </nav>
 
   <div class="container">
     <div class="section1">
-    <!-- Content for Section 1 -->
     <div class="balance-info">
-      <p>Total Balance: $500.00</p>
-      <p>Money Spent Today: $50.00</p>
+      <p><h2>Total Balance: &#x20B9;{{balance}}</h2></p>
+      <p><h2>Money Spent Today: &#x20B9;{{dailyspent}}</h2></p>
     </div>
+
     <div class="buttons">
-      <button id="add-funds-btn">Add Funds</button>
+      <button id="add-funds-btn">Add Funds</button><br>
       <button id="add-expense-btn">Add Expense</button>
     </div>
 
-
-     <div class="popup-form" id="add-funds-form">
-      <label for="amount">Amount:</label>
-      <input type="text" id="amount" placeholder="Enter amount">
-
-      <button id="add-funds-submit">Submit</button>
+     <div class="popup-form" id ="add-funds-form">
+      <form action="/add_fund" method="post">
+        <label for="amount">Amount:</label>
+        <input name="amount" type="text" id="amount" placeholder="Enter amount">
+        <label for="category1">Category:</label>
+        <select name="category" id="category1">
+          <option name="salary" value="salary">Salary</option>
+          <option name="deposits" value="deposits">Deposits</option>
+        </select>
+         <br><br>
+        <button type="submit" id="add-funds-submit">Submit</button>
+      </form>
     </div>
-
     <div class="popup-form" id="add-expense-form">
-      <label for="expense-amount">Amount:</label>
-      <input type="text" id="expense-amount" placeholder="Enter amount">
-
-      <label for="category">Category:</label>
-      <select id="category">
-        <option value="food">Food</option>
-        <option value="transportation">Transportation</option>
-        <option value="utilities">Utilities</option>
-        <option value="entertainment">Entertainment</option>
-        <option value="other">Other</option>
-      </select>
-
-      <button id="add-expense-submit">Submit</button>
+      <form action="/add_expense" method="post">
+        <label for="expense-amount">Amount:</label>
+        <input name="amount" type="text" id="expense-amount" placeholder="Enter amount">
+        <label for="description">Description</label>
+        <input name="description" type="text" id="description" placeholder="Description">
+        <label for="category">Category:</label>
+        <select name="category" id="category">
+          <option value="food">Food</option>
+          <option value="transportation">Transportation</option>
+          <option value="toiletries">Toiletries</option>
+          <option value="gifts">Gifts</option>
+          <option value="bills">Bills</option>
+          <option value="other">Other</option>
+        </select>
+        <button type="submit" id="add-expense-submit">Submit</button>
+      </form>
     </div>
         <div class="separator"></div>
-    <ul class="transaction-list">
-      <li>
-        <div class="transaction-details">
-          <span class="transaction-title">Payment received</span>
-          <span class="transaction-date">2021-09-15T22:10:00</span>
-        </div>
-        <span class="transaction-amount transaction-credited">+ $50.00</span>
-      </li>
-      <li>
-        <div class="transaction-details">
-          <span class="transaction-title">Grocery shopping</span>
-          <span class="transaction-date">2021-09-14T09:30:00</span>
-        </div>
-        <span class="transaction-amount transaction-debited">- $25.00</span>
-      </li>
-      <!-- Add more transaction items as needed -->
-    </ul>
+    <h2>Last Four Transactions:</h2>
+      <ul class="transaction-list">
+          {% for transaction in transactions %}
+              <li>
+                <div class="transaction-details">
+                    <span class="transaction-title">{{ transaction[4] }}</span>
+                    <span class="transaction-date">{{ transaction[5] }}</span>
+                </div>
+                {%if transaction[2] in [1,2]%}
+                <span class="transaction-amount transaction-credited">+&#x20B9;{{ transaction[3] }}</span>
+                {%else%}
+                <span class="transaction-amount transaction-debited">-&#x20B9;{{ transaction[3] }}</span>
+                {%endif%}
+              </li>
+          {% endfor %}
+      </ul>
   </div>
     <div class="section2">
         <h2>Expenses by Category</h2>
@@ -81,16 +88,17 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     // Get the canvas elements
-    const expensesChartCanvas = document.getElementById('expensesChart');
-
+    var expensesChartCanvas = document.getElementById('expensesChart');
+    var label = {{labels | tojson | safe}};
+    var data = {{data | tojson | safe}};
 
     // Create the doughnut chart
     new Chart(expensesChartCanvas, {
       type: 'doughnut',
       data: {
-        labels: ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Category 5'],
+        labels: label,
         datasets: [{
-          data: [50, 80, 30, 60, 30],
+          data: data,
           backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
         }]
       },
