@@ -160,6 +160,15 @@ def show_chart(username):
 
     return data, labels
 
+#added this --deepan
+@app.get("/transactions/{username}", response_class=HTMLResponse)
+def transactions(request: Request, username: str):
+    cur.execute("SELECT * FROM Transactions WHERE Username = :username ORDER BY TransactionDate DESC",
+                {'username': username})
+    transactions1 = cur.fetchall()
+    context = {"request": request, "transactions": transactions1, "result": username}
+    return templates.TemplateResponse("t_history.html", context)
+
 
 @app.get("/logout", response_class=HTMLResponse)
 def logout(request: Request):
@@ -169,4 +178,5 @@ def logout(request: Request):
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="127.0.0.1", port=4000)

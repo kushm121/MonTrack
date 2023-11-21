@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <title>Dashboard</title>
   <link rel="stylesheet" href="{{ url_for('static', path='styles2.css') }}">
@@ -20,9 +20,9 @@
       <p><h2>Total Balance: &#x20B9;{{balance}}</h2></p>
       <p><h2>Money Spent Today: &#x20B9;{{dailyspent}}</h2></p>
     </div>
-
+    <br>
     <div class="buttons">
-      <button id="add-funds-btn">Add Funds</button><br>
+      <button id="add-funds-btn">Add Funds</button><br><br>
       <button id="add-expense-btn">Add Expense</button>
     </div>
 
@@ -43,7 +43,7 @@
       <form action="/add_expense" method="post">
         <label for="expense-amount">Amount:</label>
         <input name="amount" type="text" id="expense-amount" placeholder="Enter amount">
-        <label for="description">Description</label>
+        <label for="description">Amount:</label>
         <input name="description" type="text" id="description" placeholder="Description">
         <label for="category">Category:</label>
         <select name="category" id="category">
@@ -52,7 +52,7 @@
           <option value="toiletries">Toiletries</option>
           <option value="gifts">Gifts</option>
           <option value="bills">Bills</option>
-          <option value="others">Other</option>
+          <option value="other">Other</option>
         </select>
         <button type="submit" id="add-expense-submit">Submit</button>
       </form>
@@ -74,6 +74,10 @@
               </li>
           {% endfor %}
       </ul>
+        <div class="buttons">
+            <button id="t_history"><a href="/transactions/{{result}}" style="color: white; text-decoration: none;">View More</a></button>
+        </div>
+
   </div>
     <div class="section2">
         <h2>Expenses by Category</h2>
