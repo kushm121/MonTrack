@@ -67,7 +67,7 @@ def registerform(request: Request, username: Annotated[str, Form()], email: Anno
         return templates.TemplateResponse("signup.html", {"request": request, "message": message})
     else:
         cur.execute(
-            "INSERT INTO users VALUES (:username, :password, :email, :role, SYSDATE,0)",
+            "INSERT INTO users VALUES (:username, :password, :email, :role, SYSDATE)",
             {'username': username, 'email': email, 'password': password, 'role': role})
         conn.commit()
         return templates.TemplateResponse("login.html", {"request": request})
