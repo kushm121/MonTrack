@@ -1,5 +1,5 @@
 import datetime
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, Form, Query
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -171,6 +171,13 @@ def transactions(request: Request, username: str):
 @app.get("/logout", response_class=HTMLResponse)
 def logout(request: Request):
     request.session.pop('username')
+    request.session.pop('data1')
+    request.session.pop('labels1')
+    request.session.pop('data2')
+    request.session.pop('data3')
+    request.session.pop('labels3')
+    request.session.pop('data4')
+    request.session.pop('labels4')
     return RedirectResponse(url="/")
 
 
@@ -188,9 +195,40 @@ def analytics(request: Request, username: str):
     for i in result_set:
         labels.append(i[0])
         data.append(i[1])
-    print(data)
-    print(labels)
-    context = {"request": request, "result": username, "data": data, "labels": labels}
+    request.session['data1'] = data
+    request.session['labels1'] = labels
+    data2 = piechart2(username, month)
+    request.session['data2'] = data2
+
+    cur.execute("""SELECT TO_CHAR(ENDDATE, 'Month') AS MONTH_NAME, NETSAVINGS
+                    FROM REPORTS
+                    WHERE USERNAME = :username
+                    order by extract(month from ENDDATE)
+                    """, {'username': username})
+    result_set = cur.fetchall()
+    data3 = []
+    labels3 = []
+    for i in result_set:
+        labels3.append(i[0])
+        data3.append(i[1])
+    request.session['data3'] = data3
+    request.session['labels3'] = labels3
+    cur.execute("""SELECT TO_CHAR(ENDDATE, 'Month') AS MONTH_NAME, expensetotal
+                        FROM REPORTS
+                        WHERE USERNAME = :username
+                        order by extract(month from ENDDATE)
+                        """, {'username': username})
+
+    result_set = cur.fetchall()
+    data4 = []
+    labels4 = []
+    for i in result_set:
+        labels4.append(i[0])
+        data4.append(i[1])
+    request.session['data4'] = data4
+    request.session['labels4'] = labels4
+    context = {"request": request, "result": username, "data1": data, "labels1": labels, "data2": data2, "data3": data3,
+               "labels3": labels3, "data4": data4, "labels4": labels4}
     return templates.TemplateResponse("analytics.html", context)
 
 
@@ -198,7 +236,6 @@ def analytics(request: Request, username: str):
 def pie_chart1(request: Request, username: str, selected_month: str = Form(...)):
     username = request.session.get('username')
     month = selected_month
-    print(month)
     result_set_cursor = cur.var(cx_Oracle.CURSOR)
     cur.execute("BEGIN :result := get_expense_spending_per_month(:username,:month); END;",
                 result=result_set_cursor, username=username, month=month)
@@ -209,7 +246,53 @@ def pie_chart1(request: Request, username: str, selected_month: str = Form(...))
     for i in result_set:
         labels.append(i[0])
         data.append(i[1])
-    context = {"request": request, "data": data, "labels": labels, "result": username}
+    request.session['data1'] = data
+    request.session['labels1'] = labels
+    data2 = request.session.get('data2')
+    data3 = request.session.get('data3')
+    labels3 = request.session.get('labels3')
+    data4 = request.session.get('data4')
+    labels4 = request.session.get('labels4')
+    context = {"request": request, "data1": data, "labels1": labels, "result": username, "data2": data2, "data3": data3,
+               "labels3": labels3, "data4": data4, "labels4": labels4}
+    return templates.TemplateResponse("analytics.html", context)
+
+
+def piechart2(username, month):
+    cur.execute("""
+        SELECT INCOMETOTAL, EXPENSETOTAL, NETSAVINGS
+        FROM REPORTS
+        WHERE USERNAME = :username
+        AND EXTRACT(MONTH FROM ENDDATE) = :month
+    """, {'username': username, 'month': month})
+
+    result = cur.fetchone()
+
+    if result is not None:
+        tot_income = result[0] or 0
+        tot_expense = result[1] or 0
+        data = [tot_income, tot_expense]
+    else:
+        # Handle the case where no data is retrieved for the given username and month
+        data = [0, 0]
+
+    return data
+
+
+@app.post("/analytics/{username}/pie_chart2", response_class=HTMLResponse)
+def pie_chart2(request: Request, username: str, selected_month2: str = Form(...)):
+    username = request.session.get('username')
+    month = selected_month2
+    data = piechart2(username, month)
+    request.session['data2'] = data
+    data1 = request.session.get('data1')
+    labels1 = request.session.get('labels1')
+    data3 = request.session.get('data3')
+    labels3 = request.session.get('labels3')
+    data4 = request.session.get('data4')
+    labels4 = request.session.get('labels4')
+    context = {"request": request, "data2": data, "result": username, "data1": data1, "labels1": labels1,
+               "data3": data3, "labels3": labels3, "data4": data4, "labels4": labels4}
     return templates.TemplateResponse("analytics.html", context)
 
 
