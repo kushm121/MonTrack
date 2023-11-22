@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{result}}'s Analytics Page</title>
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #444;
+            overflow: hidden;
+        }
+
+        nav a {
+            float: left;
+            display: block;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        .chart-container {
+            width: 48%; /* Adjust as needed */
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .chart-options {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>{{result}}'s Analytics Dashboard</h1>
+</header>
+
+<nav>
+    <a href="#">Home</a>
+    <a href="#">Analytics</a>
+    <a href="#">Reports</a>
+    <a href="#">Logout</a>
+</nav>
+
+<section>
+    <div class="chart-container">
+        <h2>Pie Chart 1</h2>
+        <form action="/analytics/{{result}}/pie_chart1" method="post">
+        <div class="chart-options">
+            <label for="selected_month">FILTER:</label>
+            <select name="selected_month" id="selected_month">
+                <option value="1">JANUARY</option>
+                <option value="2">FEBRUARY</option>
+                <option value="3">MARCH</option>
+                <option value="4">APRIL</option>
+                <option value="5">MAY</option>
+                <option value="6">JUNE</option>
+                <option value="7">JULY</option>
+                <option value="8">AUGUST</option>
+                <option value="9">SEPTEMBER</option>
+                <option value="10">OCTOBER</option>
+                <option value="11">NOVEMBER</option>
+                <option value="12">DECEMBER</option>
+            </select>
+        </div>
+        <button type="submit" id="pieChart1Options">Submit</button>
+        </form>
+        <canvas id="pieChart1" width="400" height="200"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Pie Chart 2</h2>
+        <div class="chart-options">
+            <label for="pieChart2Options">Select Option:</label>
+            <select id="pieChart2Options">
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <option value="option3">Option 3</option>
+            </select>
+        </div>
+        <canvas id="pieChart2" width="400" height="200"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Bar Chart</h2>
+        <div class="chart-options">
+            <label for="barChartOptions">Select Option:</label>
+            <select id="barChartOptions">
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <option value="option3">Option 3</option>
+            </select>
+        </div>
+        <canvas id="barChart" width="400" height="200"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Line Chart</h2>
+        <div class="chart-options">
+            <label for="lineChartOptions">Select Option:</label>
+            <select id="lineChartOptions">
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <option value="option3">Option 3</option>
+            </select>
+        </div>
+        <canvas id="lineChart" width="400" height="200"></canvas>
+    </div>
+</section>
+
+<script>
+
+    var pieChart1Data = document.getElementById('pieChart1');
+    var label = {{labels | tojson | safe}};
+    var data = {{data | tojson | safe}};
+
+    new Chart(pieChart1Data, {
+        type: 'doughnut',
+        data: {
+            labels: label,
+            datasets: [{
+                data: data,
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+            }]
+        },
+        options: {
+            responsive: true,
+            legend: {
+                position: 'bottom'
+            }
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Sample data (replace with your data)
+        var pieChartData2 = {
+            labels: ['Savings', 'Expenses'],
+            datasets: [{
+                data: [40, 30],
+                backgroundColor: ['#FF6384', '#36A2EB']
+            }]
+        };
+
+        var barChartData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Bar Chart Data',
+                data: [50, 30, 40, 20, 60],
+                backgroundColor: '#36A2EB'
+            }]
+        };
+
+        var lineChartData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Line Chart Data',
+                data: [20, 30, 25, 35, 40],
+                borderColor: '#FF6384',
+                fill: false
+            }]
+        };
+
+        var pieChart2 = new Chart(document.getElementById('pieChart2').getContext('2d'), {
+            type: 'pie',
+            data: pieChartData2
+        });
+
+        var barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
+            type: 'bar',
+            data: barChartData
+        });
+
+        var lineChart = new Chart(document.getElementById('lineChart').getContext('2d'), {
+            type: 'line',
+            data: lineChartData
+        });
+    });
+</script>
+
+</body>
+</html>

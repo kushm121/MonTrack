@@ -67,7 +67,7 @@ def registerform(request: Request, username: Annotated[str, Form()], email: Anno
         return templates.TemplateResponse("signup.html", {"request": request, "message": message})
     else:
         cur.execute(
-            "INSERT INTO users VALUES (:username, :password, :email, :role, SYSDATE)",
+            "INSERT INTO users VALUES (:username, :password, :email, :role, SYSDATE,0)",
             {'username': username, 'email': email, 'password': password, 'role': role})
         conn.commit()
         return templates.TemplateResponse("login.html", {"request": request})
@@ -117,9 +117,7 @@ def get_category_id(category_name):
 @app.post("/add_fund", response_class=HTMLResponse)
 def add_funds(request: Request, amount: Annotated[float, Form()], category: Annotated[str, Form()]):
     amount = float(amount)
-    print(category)
     category_id = get_category_id(category)
-    print(category_id)
     username = request.session.get('username')
     transaction_type = category
 
@@ -160,7 +158,7 @@ def show_chart(username):
 
     return data, labels
 
-#added this --deepan
+
 @app.get("/transactions/{username}", response_class=HTMLResponse)
 def transactions(request: Request, username: str):
     cur.execute("SELECT * FROM Transactions WHERE Username = :username ORDER BY TransactionDate DESC",
@@ -174,6 +172,45 @@ def transactions(request: Request, username: str):
 def logout(request: Request):
     request.session.pop('username')
     return RedirectResponse(url="/")
+
+
+@app.get("/analytics/{username}", response_class=HTMLResponse)
+def analytics(request: Request, username: str):
+    month = datetime.date.today().month
+    result_set_cursor = cur.var(cx_Oracle.CURSOR)
+    cur.execute("BEGIN :result := get_expense_spending_per_month(:username,:month); END;",
+                result=result_set_cursor, username=username, month=month)
+
+    result_set = result_set_cursor.getvalue()
+    data = []
+    labels = []
+
+    for i in result_set:
+        labels.append(i[0])
+        data.append(i[1])
+    print(data)
+    print(labels)
+    context = {"request": request, "result": username, "data": data, "labels": labels}
+    return templates.TemplateResponse("analytics.html", context)
+
+
+@app.post("/analytics/{username}/pie_chart1", response_class=HTMLResponse)
+def pie_chart1(request: Request, username: str, selected_month: str = Form(...)):
+    username = request.session.get('username')
+    month = selected_month
+    print(month)
+    result_set_cursor = cur.var(cx_Oracle.CURSOR)
+    cur.execute("BEGIN :result := get_expense_spending_per_month(:username,:month); END;",
+                result=result_set_cursor, username=username, month=month)
+    result_set = result_set_cursor.getvalue()
+    data = []
+    labels = []
+
+    for i in result_set:
+        labels.append(i[0])
+        data.append(i[1])
+    context = {"request": request, "data": data, "labels": labels, "result": username}
+    return templates.TemplateResponse("analytics.html", context)
 
 
 if __name__ == "__main__":
