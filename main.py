@@ -1,5 +1,5 @@
 import datetime
-from fastapi import FastAPI, Request, Form, Query
+from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -17,12 +17,13 @@ templates = Jinja2Templates(directory="templates")
 app.add_middleware(SessionMiddleware, secret_key=Secret_key)
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse)  # home page
 def read_root(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
 
-@app.get("/login", response_class=HTMLResponse)
+# login ,signup and logout
+@app.get("/login", response_class=HTMLResponse)  # login page
 def login(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
@@ -67,10 +68,23 @@ def registerform(request: Request, username: Annotated[str, Form()], email: Anno
         return templates.TemplateResponse("signup.html", {"request": request, "message": message})
     else:
         cur.execute(
-            "INSERT INTO users VALUES (:username, :password, :email, :role, SYSDATE,0)",
+            "INSERT INTO users VALUES (:username, :password, :email, :role, SYSDATE)",
             {'username': username, 'email': email, 'password': password, 'role': role})
         conn.commit()
         return templates.TemplateResponse("login.html", {"request": request})
+
+
+@app.get("/logout", response_class=HTMLResponse)
+def logout(request: Request):
+    request.session.pop('username')
+    request.session.pop('data1')
+    request.session.pop('labels1')
+    request.session.pop('data2')
+    request.session.pop('data3')
+    request.session.pop('labels3')
+    request.session.pop('data4')
+    request.session.pop('labels4')
+    return RedirectResponse(url="/")
 
 
 def total_balace(username):
@@ -78,21 +92,38 @@ def total_balace(username):
     totbal = cur.var(cx_Oracle.NUMBER)
     cur.execute('BEGIN :result := get_total_balance(:username); END;', result=totbal, username=username)
     totbal = totbal.getvalue()
-    return totbal
+    return totbal  # total balance
 
 
+# dashboard
 @app.post("/dashboard/{username}", response_class=HTMLResponse)
 def dashboard(request: Request, username: str):
     result = total_balace(username)
-    cur.callfunc('calculate_total_spending', float, [username, datetime.date.today()])
+    # cur.callfunc('calculate_total_spending', float, [username, datetime.date.today()])
     dailymoneyspent = dailyspending(username, datetime.date.today())
     cur.execute(
         "SELECT * FROM Transactions WHERE Username = :username ORDER BY TransactionDate DESC FETCH FIRST 4 ROWS ONLY",
         {'username': username})
     transactions = cur.fetchall()
     data, labels = show_chart(username)
+    cur.execute("""select to_char(ENDDATE,'MONTH'),INCOMETOTAL,EXPENSETOTAL
+                    from REPORTS where USERNAME = :username""", {'username': username})
+    result_set = cur.fetchall()
+    month = []
+    income = []
+    expense = []
+    if result_set:
+        for i in result_set:
+            month.append(i[0])
+            income.append(i[1])
+            expense.append(i[2])
+    else:
+        month = ["No data"]
+        income = [0]
+        expense = [0]
     context = {"request": request, "result": username, "balance": result, "dailyspent": dailymoneyspent,
-               "transactions": transactions, "data": data, "labels": labels}
+               "transactions": transactions, "data": data, "labels": labels, "month": month, "income": income,
+               "expense": expense}
     return templates.TemplateResponse("index.html", context)
 
 
@@ -159,6 +190,7 @@ def show_chart(username):
     return data, labels
 
 
+# transactions
 @app.get("/transactions/{username}", response_class=HTMLResponse)
 def transactions(request: Request, username: str):
     cur.execute("SELECT * FROM Transactions WHERE Username = :username ORDER BY TransactionDate DESC",
@@ -168,19 +200,7 @@ def transactions(request: Request, username: str):
     return templates.TemplateResponse("t_history.html", context)
 
 
-@app.get("/logout", response_class=HTMLResponse)
-def logout(request: Request):
-    request.session.pop('username')
-    request.session.pop('data1')
-    request.session.pop('labels1')
-    request.session.pop('data2')
-    request.session.pop('data3')
-    request.session.pop('labels3')
-    request.session.pop('data4')
-    request.session.pop('labels4')
-    return RedirectResponse(url="/")
-
-
+# analytics
 @app.get("/analytics/{username}", response_class=HTMLResponse)
 def analytics(request: Request, username: str):
     month = datetime.date.today().month

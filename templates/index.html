@@ -52,7 +52,7 @@
           <option value="toiletries">Toiletries</option>
           <option value="gifts">Gifts</option>
           <option value="bills">Bills</option>
-          <option value="other">Other</option>
+          <option value="others">Other</option>
         </select>
         <button type="submit" id="add-expense-submit">Submit</button>
       </form>
@@ -96,17 +96,17 @@
   <script>
     // Get the canvas elements
     var expensesChartCanvas = document.getElementById('expensesChart');
-    var label = {{labels | tojson | safe}};
-    var data = {{data | tojson | safe}};
+    var label1 = {{labels | tojson | safe}};
+    var data1 = {{data | tojson | safe}};
 
     // Create the doughnut chart
     new Chart(expensesChartCanvas, {
       type: 'doughnut',
       data: {
-        labels: label,
+        labels: label1,
         datasets: [{
-          data: data,
-          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+          data: data1,
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF','#7f00A4'],
         }]
       },
       options: {
@@ -119,24 +119,26 @@
     });
 
     // Create the line double bar chart
-    const chartCanvas = document.getElementById('lineDoubleBarChart');
-
+    var chartCanvas = document.getElementById('lineDoubleBarChart');
+    var label2 = {{month| tojson | safe}};
+    var data2 = {{income | tojson | safe}};
+    var data3 = {{expense | tojson | safe}};
   // Create the line double bar chart
   new Chart(chartCanvas, {
     type: 'bar',
     data: {
-      labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September','October','November','December'],
+      labels: label2,
       datasets: [
         {
           label: 'Expenses',
-          data: [500, 600, 400, 700, 550, 800],
+          data: data3,
           backgroundColor: 'rgba(255, 99, 132, 0.5)',
           borderColor: 'rgba(255, 99, 132, 1)',
           borderWidth: 1
         },
         {
           label: 'Income',
-          data: [1000, 1200, 900, 1100, 950, 1300],
+          data: data2,
           backgroundColor: 'rgba(54, 162, 235, 0.5)',
           borderColor: 'rgba(54, 162, 235, 1)',
           borderWidth: 1
