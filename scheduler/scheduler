@@ -1,0 +1,16 @@
+DECLARE
+    CURSOR user_cursor IS
+        SELECT Username FROM Users;
+BEGIN
+    FOR user_rec IN user_cursor LOOP
+        DBMS_SCHEDULER.create_job (
+            job_name        => 'GENERATE_MONTHLY_REPORT_JOB_' || user_rec.Username,
+            job_type        => 'PLSQL_BLOCK',
+            job_action      => 'BEGIN generate_monthly_report(''' || user_rec.Username || '''); END;',
+            start_date      => SYSTIMESTAMP,
+            repeat_interval => 'FREQ=MONTHLY; BYMONTHDAY=-1',
+            enabled         => TRUE
+        );
+    END loop ;
+END;
+/

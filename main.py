@@ -87,6 +87,7 @@ def logout(request: Request):
     return RedirectResponse(url="/")
 
 
+
 def total_balace(username):
     cur.callfunc('get_total_balance', float, [username])
     totbal = cur.var(cx_Oracle.NUMBER)
@@ -217,9 +218,8 @@ def analytics(request: Request, username: str):
         data.append(i[1])
     request.session['data1'] = data
     request.session['labels1'] = labels
-    data2 = piechart2(username, month)
+    data2 = piechart2(username, month-1)
     request.session['data2'] = data2
-
     cur.execute("""SELECT TO_CHAR(ENDDATE, 'Month') AS MONTH_NAME, NETSAVINGS
                     FROM REPORTS
                     WHERE USERNAME = :username
@@ -311,6 +311,7 @@ def pie_chart2(request: Request, username: str, selected_month2: str = Form(...)
     labels3 = request.session.get('labels3')
     data4 = request.session.get('data4')
     labels4 = request.session.get('labels4')
+
     context = {"request": request, "data2": data, "result": username, "data1": data1, "labels1": labels1,
                "data3": data3, "labels3": labels3, "data4": data4, "labels4": labels4}
     return templates.TemplateResponse("analytics.html", context)

@@ -3,6 +3,7 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/plsql/AddIncome.sql" dialect="OracleSqlPlus" />
     <file url="file://$PROJECT_DIR$/plsql/calculate_total_spending.sql" dialect="OracleSqlPlus" />
+    <file url="file://$PROJECT_DIR$/plsql/generate_monthly_report.sql" dialect="OracleSqlPlus" />
     <file url="file://$PROJECT_DIR$/plsql/get_expense_spending.sql" dialect="OracleSqlPlus" />
     <file url="file://$PROJECT_DIR$/plsql/get_total_balance.sql" dialect="OracleSqlPlus" />
     <file url="file://$PROJECT_DIR$/sequences/REPORTID_SEQ.sql" dialect="OracleSqlPlus" />
