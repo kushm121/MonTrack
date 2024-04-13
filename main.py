@@ -153,7 +153,7 @@ def dailyspending(username, date):
     cur.callfunc('calculate_total_spending', float, [username, date])
     dailyspent = cur.var(cx_Oracle.NUMBER)
     cur.execute('BEGIN :result := calculate_total_spending(:username, :today); END;',
-                result=dailyspent, username=username, today=datetime.today().today())
+                result=dailyspent, username=username, today=datetime.today().date())
     dailyspent = dailyspent.getvalue()
     return dailyspent
 
@@ -200,6 +200,7 @@ def transactions(request: Request, username: str):
         8: "Others"
     }
     dailyspend = dailyspending(username, datetime.today().date())
+    print(dailyspend)
     context = {"request": request, "transactions": transactions1, "result": username, "balance": tot_bal,
                "dailyspent": dailyspend, "category_names": category_names}
     return templates.TemplateResponse("transactions.html", context)

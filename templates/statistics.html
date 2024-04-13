@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{#    <link rel="stylesheet" href="static/styles.css">#}
+    <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+
+
+    <title>MONTRACK</title>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="#" class="logo">
+            <i class='bx bx-code-alt'></i>
+            <div class="logo-name"><span>MON</span>TRACK</div>
+        </a>
+        <ul class="side-menu">
+            <li><a href="/dashboard/{{ result }}"><i class='bx bxs-dashboard'></i>Dashboard</a></li>
+            <li><a href="/transactions/{{result}}"><i class='bx bx-store-alt'></i>Transactions</a></li>
+            <li class="active"><a href="#"><i class='bx bx-analyse'></i>Analytics</a></li>
+{#            <li><a href="#"><i class='bx bx-cog'></i>Settings</a></li>#}
+        </ul>
+        <ul class="side-menu">
+            <li>
+                <a href="/logout" class="logout">
+                    <i class='bx bx-log-out-circle'></i>
+                    Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+    <!-- End of Sidebar -->
+
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Navbar -->
+        <nav>
+            <i class='bx bx-menu'></i>
+            <form action="#">
+                <div class="form-input">
+                    <input type="search" placeholder="Search...">
+                    <button class="search-btn" type="submit"><i class='bx bx-search'></i></button>
+                </div>
+            </form>
+            <input type="checkbox" id="theme-toggle" hidden>
+            <label for="theme-toggle" class="theme-toggle"></label>
+            <a href="#" class="notif">
+                <i class='bx bx-bell'></i>
+                <span class="count">12</span>
+            </a>
+            <a href="#" class="profile">
+{#                <img src="images/logo.png">#}
+            </a>
+        </nav>
+
+        <!-- End of Navbar -->
+
+        <main>
+            <div class="header">
+                <div class="left">
+                    <h1>Statistics</h1>
+                    <ul class="breadcrumb">
+                        <li><a href="#">
+                                Visuals
+                            </a></li>
+                    </ul>
+                </div>
+                <!-- <a href="#" class="report">
+                    <i class='bx bx-cloud-download'></i>
+                    <span>Download CSV</span>
+                </a> -->
+            </div>
+
+            <!-- Insights -->
+            <div class="charts">
+                <div class="charts-card">
+                    <p class="chart-title">Monthly Spending vs Expenses</p>
+                    <div id="bar-chart"></div>
+                </div>
+                <div class="charts-card">
+                    <p class="chart-title">Category Wise Spending</p>
+                    <div id="pie-chart"></div>
+                </div>
+                <div class="charts-card">
+                    <p class="chart-title">Expenses vs Income</p>
+                    <div id="heatmap-chart"></div>
+                </div>
+                <div class="charts-card">
+                    <p class="chart-title">How much is spent in each category</p>
+                    <div id="radial-bar-chart"></div>
+                </div>
+            </div>
+
+
+{#            <div class="bottom-data">#}
+{#                <div class="orders">#}
+{#                    <div class="header">#}
+{#                        <i class='bx bx-receipt'></i>#}
+{#                        <h3>Recent Transactions</h3>#}
+{#                        <i class='bx bx-filter'></i>#}
+{#                        <i class='bx bx-search'></i>#}
+{#                    </div>#}
+{#                    <table>#}
+{#                        <thead>#}
+{#                            <tr>#}
+{#                                <th>Transaction</th>#}
+{#                                <th>Date Time</th>#}
+{#                                <th>Type</th>#}
+{#                            </tr>#}
+{#                        </thead>#}
+{#                        <tbody>#}
+{#                            {% for transaction in transactions %}#}
+{#                            <tr>#}
+{#                                <td>{{ transaction[4] }}</td>#}
+{#                                <td class="transaction-date">{{ transaction[5] }}</td>#}
+{#                                {%if transaction[2] in [1,2]%}#}
+{#                                <td><span class="status completed">+&#x20B9;{{ transaction[3] }}</span></td>#}
+{#                                {%else%}#}
+{#                                <td><span class="status process">-&#x20B9;{{ transaction[3] }}</span></td>#}
+{#                                {%endif%}#}
+{#                            </tr>#}
+{#                            {% endfor %}#}
+{#                        </tbody>#}
+{#                    </table>#}
+{#                </div>#}
+{##}
+{#                <!-- Reminders -->#}
+{#                <div class="reminders">#}
+{#                    <div class="header">#}
+{#                        <i class='bx bx-note'></i>#}
+{#                        <h3>Reminders</h3>#}
+{#                        <i class='bx bx-filter'></i>#}
+{#                        <i class='bx bx-plus'></i>#}
+{#                    </div>#}
+{#                    <ul class="task-list">#}
+{#                        <li class="completed">#}
+{#                            <div class="task-title">#}
+{#                                <i class='bx bx-check-circle'></i>#}
+{#                                <p>Start Our Meeting</p>#}
+{#                            </div>#}
+{#                            <i class='bx bx-dots-vertical-rounded'></i>#}
+{#                        </li>#}
+{#                        <li class="completed">#}
+{#                            <div class="task-title">#}
+{#                                <i class='bx bx-check-circle'></i>#}
+{#                                <p>Analyse Our Site</p>#}
+{#                            </div>#}
+{#                            <i class='bx bx-dots-vertical-rounded'></i>#}
+{#                        </li>#}
+{#                        <li class="not-completed">#}
+{#                            <div class="task-title">#}
+{#                                <i class='bx bx-x-circle'></i>#}
+{#                                <p>Play Football</p>#}
+{#                            </div>#}
+{#                            <i class='bx bx-dots-vertical-rounded'></i>#}
+{#                        </li>#}
+{#                    </ul>#}
+{#                </div>#}
+{##}
+{#                <!-- End of Reminders-->#}
+{##}
+{#            </div>#}
+
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.48.0/apexcharts.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="{{ url_for('static', path='scripts2.js') }}"></script>
+    <script>
+        const contextData2 = {
+            exp : {{ data | tojson }},
+            category : {{ labels | tojson  }},
+            exp2 : {{ data1 | tojson }},
+            month : {{ labels1 | tojson }},
+            exp3 : {{ data2 | tojson }},
+            month2 : {{ labels2 | tojson }},
+            data_per : {{ data_per | tojson }},
+        } ;
+        initCharts(contextData2)
+    </script>
+
+</body>
+
+</html>
