@@ -145,7 +145,7 @@ a:hover {
 
 .transaction-date {
   margin-top: 5px;
-  color: gray;
+  color: rgb(128, 128, 128);
 }
 
 .balance-info {
